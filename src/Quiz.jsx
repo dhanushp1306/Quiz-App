@@ -1,62 +1,165 @@
-import React, { useState } from "react";
-import questions from "./data";
+import { useState } from "react";
+import "./Quiz.css";
 
-function Quiz() {
+const questions = [
+    {
+        question: "What is the capital of India?",
+        options: ["Mumbai", "Delhi", "Chennai", "Kolkata"],
+        answer: "Delhi",
+    },
+    {
+        question: "Which language runs in a browser?",
+        options: ["Python", "Java", "C++", "JavaScript"],
+        answer: "JavaScript",
+    },
+    {
+        question: "What does CSS stand for?",
+        options: [
+            "Central Style Sheets",
+            "Cascading Style Sheets",
+            "Computer Style Sheets",
+            "Creative Style Sheets",
+        ],
+        answer: "Cascading Style Sheets",
+    },
+];
+
+export default function Quiz({ name }) {
     const [current, setCurrent] = useState(0);
+    const [selected, setSelected] = useState(null);
+    const [answers, setAnswers] = useState({});
+    const [visited, setVisited] = useState(new Set([0]));
+    const [showPopup, setShowPopup] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
     const [score, setScore] = useState(0);
-    const [showScore, setShowScore] = useState(false);
 
-    const handleAnswer = (selected) => {
-        if (selected === questions[current].answer) {
-            setScore(score + 1);
-        }
+    const handleSubmitAnswer = () => {
+        if (!selected) return;
 
-        const next = current + 1;
-        if (next < questions.length) {
+        const updatedAnswers = { ...answers, [current]: selected };
+        setAnswers(updatedAnswers);
+        setSelected(null);
+
+        if (current < questions.length - 1) {
+            const next = current + 1;
             setCurrent(next);
-        } else {
-            setShowScore(true);
+            setVisited(new Set([...visited, next]));
         }
     };
 
-    const restartQuiz = () => {
-        setCurrent(0);
-        setScore(0);
-        setShowScore(false);
+    const handleFinalSubmit = () => setShowPopup(true);
+
+    const confirmSubmit = () => {
+        let total = 0;
+        questions.forEach((q, index) => {
+            if (answers[index] === q.answer) total++;
+        });
+        setScore(total);
+        setIsSubmitted(true);
+        setShowPopup(false);
+    };
+
+    const handleSidebarClick = (index) => {
+        setCurrent(index);
+        setSelected(answers[index] || null);
+        setVisited(new Set([...visited, index]));
     };
 
     return (
-        <div className="quiz">
-            {showScore ? (
-                <div className="result">
-                    <h2>Your Score</h2>
-                    <p>{score} / {questions.length}</p>
-                    <button className="restart-btn" onClick={restartQuiz}>
-                        Restart Quiz
-                    </button>
-                </div>
-            ) : (
-                <>
-                    <div className="question-section">
-                        <h2>Question {current + 1}</h2>
-                        <p>{questions[current].question}</p>
-                    </div>
+        <div className="quiz-container">
+            {!isSubmitted && (
+                <div className="sidebar">
+                    {questions.map((_, index) => {
+                        let statusClass = "not-answered";
+                        if (answers[index]) statusClass = "answered"; // green
+                        else if (index === current) statusClass = "current"; // blue
+                        else if (visited.has(index)) statusClass = "seen"; // red
 
-                    <div className="options">
-                        {questions[current].options.map((option, index) => (
+                        return (
                             <button
                                 key={index}
-                                className="option-btn"
-                                onClick={() => handleAnswer(option)}
+                                className={`sidebar-btn ${statusClass}`}
+                                onClick={() => handleSidebarClick(index)}
                             >
-                                {option}
+                                {index + 1}
                             </button>
-                        ))}
+                        );
+                    })}
+                </div>
+            )}
+
+            <div className={`quiz-box ${isSubmitted ? "result-theme" : ""}`}>
+                {!isSubmitted ? (
+                    <>
+                        <h2>Welcome, {name}</h2>
+                        <div className="question">
+                            Q{current + 1}. {questions[current].question}
+                        </div>
+
+                        <div className="options">
+                            {questions[current].options.map((option, index) => {
+                                const isSelected = selected === option;
+                                const isAnswered = answers[current] === option;
+
+                                let btnClass = "option-btn";
+                                if (isSelected) btnClass += " selected";
+                                if (isAnswered) btnClass += " submitted";
+
+                                return (
+                                    <button
+                                        key={index}
+                                        className={btnClass}
+                                        onClick={() => setSelected(option)}
+                                    >
+                                        {option}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <div className="quiz-buttons">
+                            <button
+                                className="submit-btn"
+                                onClick={handleSubmitAnswer}
+                                disabled={!selected}
+                            >
+                                Submit Answer
+                            </button>
+                            <button className="final-btn" onClick={handleFinalSubmit}>
+                                Final Submit
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <div className="result-box">
+                        <h1>Quiz Completed</h1>
+                        <h2>Candidate: {name}</h2>
+                        <h2>
+                            Your Total Score is {score} / {questions.length}
+                        </h2>
+                        <h3>Thank you for playing!</h3>
                     </div>
-                </>
+                )}
+            </div>
+
+            {showPopup && (
+                <div className="popup">
+                    <div className="popup-content">
+                        <h3>Are you sure you want to submit the quiz?</h3>
+                        <div className="popup-buttons">
+                            <button className="confirm-btn" onClick={confirmSubmit}>
+                                Yes
+                            </button>
+                            <button
+                                className="cancel-btn"
+                                onClick={() => setShowPopup(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
 }
-
-export default Quiz;
