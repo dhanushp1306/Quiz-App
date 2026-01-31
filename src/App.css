@@ -1,77 +1,65 @@
-* {
+/* Reset margins and full height */
+html,
+body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  /* removes scroll */
   font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  /* full blue background */
 }
 
+/* Border-box */
+* {
+  box-sizing: border-box;
+}
+
+/* Main App container */
 .app {
-  height: 100vh;
-  background: linear-gradient(135deg, #4e73df, #1cc88a);
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
+  /* horizontal center */
   align-items: center;
+  /* vertical center */
 }
 
-.quiz-card {
-  background: white;
-  padding: 40px;
-  width: 400px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  text-align: center;
-}
-
-.title {
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.question-section h2 {
-  margin-bottom: 10px;
-  color: #4e73df;
-}
-
-.question-section p {
-  margin-bottom: 20px;
-  font-size: 16px;
-}
-
-.options {
+/* Welcome screen */
+.welcome {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.option-btn {
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background-color: #4e73df;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   color: white;
-  cursor: pointer;
-  transition: 0.3s;
+  padding: 20px;
 }
 
-.option-btn:hover {
-  background-color: #2e59d9;
+/* Welcome screen elements */
+.welcome h1 {
+  font-size: 2rem;
+  margin-bottom: 30px;
 }
 
-.result p {
-  font-size: 20px;
-  margin: 15px 0;
-}
-
-.restart-btn {
+.welcome input {
   padding: 10px 15px;
-  border: none;
+  font-size: 1rem;
+  margin: 15px 0;
   border-radius: 8px;
-  background-color: #1cc88a;
-  color: white;
-  cursor: pointer;
-  transition: 0.3s;
+  border: none;
+  width: 250px;
 }
 
-.restart-btn:hover {
-  background-color: #17a673;
+.welcome button {
+  padding: 12px 25px;
+  border-radius: 8px;
+  border: none;
+  background: #16a34a;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
 }
